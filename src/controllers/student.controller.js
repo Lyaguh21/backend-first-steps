@@ -1,36 +1,50 @@
 const service = require("../services/student.service");
 
+function parseId(idRaw) {
+  const id = Number(idRaw);
+  if (!Number.isInteger(id)) return null;
+  return id;
+}
+
 exports.getStudents = async (req, res) => {
   studentsList = await service.getAll();
   return res.status(200).json(studentsList);
 };
 
 exports.getStudentsById = async (req, res) => {
-  const userId = req.params.id;
-  if (!userId) return res.status(400).send("id not found");
+  const id = req.validated.params.id;
 
-  const student = await service.getById(userId);
-  if (!student) return res.status(404).send("Student not found");
+  const student = await service.getById(id);
+  if (!student) return res.status(404).json({ error: "Student not found" });
 
   return res.status(200).json(student);
 };
 
 exports.createStudent = async (req, res) => {
-  const name = (req.body.name || "").trim();
-  const email = (req.body.email || "").trim();
-  const age = req.body.age;
-
-  if (!name) {
-    return res.status(400).send("Name is required");
-  }
-  if (!email) {
-    return res.status(400).send("Email is required");
-  }
-  if (!age) {
-    return res.status(400).send("Age is required");
-  }
+  const { name, email, age } = req.validated.body;
 
   newStudent = await service.create(name, email, age);
 
   return res.status(201).json(newStudent);
+};
+
+exports.updateStudent = async (req, res) => {
+  const id = req.validated.params;
+  const data = req.validated.body;
+
+  const updatedStudent = await service.update(id, data);
+  if (!updatedStudent)
+    return res.status(404).json({ error: "Student not found" });
+
+  return res.status(200).json(updatedStudent);
+};
+
+exports.deleteStudent = async (req, res) => {
+  const id = req.validated.params.id;
+
+  const deletedStudent = await service.delete(id);
+  if (!deletedStudent)
+    return res.status(404).json({ error: "Student not found" });
+
+  return res.status(200).json(deletedStudent);
 };
