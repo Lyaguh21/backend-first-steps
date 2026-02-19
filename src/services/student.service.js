@@ -1,17 +1,18 @@
-const { students } = require("../DB");
+const prisma = require("../prisma");
 
-exports.getAll = () => {
-  return students;
+exports.getAll = async () => {
+  return prisma.student.findMany();
 };
 
-exports.getById = (userId) => {
-  student = students.find((el) => el.id === Number(userId));
-  return student;
+exports.getById = async (userId) => {
+  return prisma.student.findUnique({
+    where: { id: Number(userId) },
+  });
 };
 
-exports.create = (name) => {
-  const newStudent = { id: students.length + 1, name };
-  students.push(newStudent);
-
-  return newStudent;
+exports.create = async (name, email, age) => {
+  const newStudent = { name, email, age };
+  return prisma.student.create({
+    data: newStudent,
+  });
 };
