@@ -1,4 +1,5 @@
 const express = require("express");
+const studentsRoutes = require("./routes/student.routes");
 
 const app = express();
 app.use(express.json());

@@ -1,8 +1,8 @@
 const service = require("../services/student.service");
-const students = require("../DB/students");
 
 exports.getStudents = (req, res) => {
-  return res.status(200).send(students);
+  studentsList = service.getAll();
+  return res.status(200).json(studentsList);
 };
 
 exports.getStudentsById = (req, res) => {
@@ -10,19 +10,18 @@ exports.getStudentsById = (req, res) => {
   if (!userId) return res.status(400).send("id not found");
 
   const student = service.getById(userId);
-
   if (!student) return res.status(404).send("Student not found");
-  res.status(200).send(student);
+
+  return res.status(200).json(student);
 };
-//* ТУт конец
+
 exports.createStudent = (req, res) => {
   const name = (req.body.name || "").trim();
-
   if (!name) {
     return res.status(400).send("Name is required");
   }
-  const newStudent = { id: students.length + 1, name };
-  students.push(newStudent);
+
+  newStudent = service.create(name);
 
   return res.status(201).json(newStudent);
 };
