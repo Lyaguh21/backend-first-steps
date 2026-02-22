@@ -1,5 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { StudentsService } from './students.service';
+import { CreateStudentDto } from './dto/create-student.dto';
+import { UpdateStudentDto } from './dto/update-student.dto';
 
 @Controller('students')
 export class StudentsController {
@@ -11,17 +23,33 @@ export class StudentsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.studentsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const student = await this.studentsService.findOne(id);
+    if (!student)
+      throw new NotFoundException(`Student with id ${id} not found`);
+    return student;
   }
 
   @Post()
-  create(@Body() body: { name: string; email?: string; age?: number }) {
-    return this.studentsService.create(body.name, body.email, body.age);
+  create(@Body() dto: CreateStudentDto) {
+    return this.studentsService.create(dto);
+  }
+
+  @Patch(':id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateStudentDto,
+  ) {
+    const updatedStudent = await this.studentsService.update(id, dto);
+    if (!updatedStudent)
+      throw new NotFoundException(`Student with id ${id} not found`);
+    return updatedStudent;
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.studentsService.remove(Number(id));
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    const ok = await this.studentsService.remove(id);
+    if (!ok) throw new NotFoundException(`Student with id ${id} not found`);
+    return { message: `Студент с id ${id} удалён` };
   }
 }
