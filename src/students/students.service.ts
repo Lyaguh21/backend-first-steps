@@ -58,15 +58,10 @@ export class StudentsService {
   }
 
   async update(id: number, dto: UpdateStudentDto) {
-    const existing = await this.prisma.student.findUnique({ where: { id } });
-    if (!existing) return null;
     return this.prisma.student.update({ where: { id }, data: dto });
   }
 
   async remove(id: number) {
-    const existing = await this.prisma.student.findUnique({ where: { id } });
-    if (!existing) return null;
-
     await this.prisma.student.delete({ where: { id } });
     return true;
   }
