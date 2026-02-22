@@ -2,13 +2,51 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
+import { ListStudentsDto } from './dto/list-students.dto';
+import { QueryMode } from 'generated/prisma/internal/prismaNamespace';
 
 @Injectable()
 export class StudentsService {
   constructor(private prisma: PrismaService) {}
 
-  findAll() {
-    return this.prisma.student.findMany();
+  async findAll(query: ListStudentsDto) {
+    const page = query.page || 1;
+    const limit = query.limit || 10;
+    const search = query.search?.trim();
+
+    const where = search
+      ? {
+          OR: [
+            { name: { contains: search, mode: QueryMode.insensitive } },
+            { email: { contains: search, mode: QueryMode.insensitive } },
+          ],
+        }
+      : undefined;
+
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.prisma.student.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { id: 'asc' },
+      }),
+
+      this.prisma.student.count({ where }),
+    ]);
+
+    const pages = Math.ceil(total / limit);
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        pages,
+      },
+    };
   }
 
   findOne(id: number) {
