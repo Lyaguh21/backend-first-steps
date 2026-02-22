@@ -1,22 +1,27 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { StudentsService } from './students.service';
 
 @Controller('students')
 export class StudentsController {
-  constructor(private readonly studentServise: StudentsService) {}
+  constructor(private readonly studentsService: StudentsService) {}
 
   @Get()
-  getAll() {
-    return this.studentServise.findAll();
+  findAll() {
+    return this.studentsService.findAll();
   }
 
   @Get(':id')
-  getOne(@Param('id') id: string) {
-    return this.studentServise.findOne(Number(id));
+  findOne(@Param('id') id: number) {
+    return this.studentsService.findOne(id);
   }
 
   @Post()
-  create(@Body('name') name: string) {
-    return this.studentServise.create(name);
+  create(@Body() body: { name: string; email?: string; age?: number }) {
+    return this.studentsService.create(body.name, body.email, body.age);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.studentsService.remove(Number(id));
   }
 }

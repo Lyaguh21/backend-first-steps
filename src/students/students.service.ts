@@ -1,31 +1,24 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class StudentsService {
-  private students = [
-    { id: 1, name: 'Alla' },
-    {
-      id: 2,
-      name: 'Igor',
-    },
-  ];
+  constructor(private prisma: PrismaService) {}
 
   findAll() {
-    return this.students;
+    return this.prisma.student.findMany();
   }
 
   findOne(id: number) {
-    return this.students.find((el) => el.id === id);
+    return this.prisma.student.findUnique({ where: { id } });
   }
 
-  create(name: string) {
-    const newStudent = {
-      id: this.students.length + 1,
-      name: name,
-    };
+  create(name: string, email?: string, age?: number) {
+    return this.prisma.student.create({ data: { name, email, age } });
+  }
 
-    this.students.push(newStudent);
-
-    return newStudent;
+  async remove(id: number) {
+    await this.prisma.student.delete({ where: { id } });
+    return { message: `Student with id ${id} has been removed.` };
   }
 }
