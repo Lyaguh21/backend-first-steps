@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { StudentsModule } from './students/students.module';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
 import Joi from 'joi';
 
 @Module({
@@ -17,6 +18,7 @@ import Joi from 'joi';
     }),
     PrismaModule,
     StudentsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
