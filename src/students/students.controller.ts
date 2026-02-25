@@ -9,21 +9,29 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { ListStudentsDto } from './dto/list-students.dto';
+import { JwtAccessGuard } from 'src/auth/guards/jwt-access.guard';
+import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('students')
 @Controller('students')
 export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 
+  @ApiCookieAuth('accessToken')
+  @UseGuards(JwtAccessGuard)
   @Get()
   findAll(@Query() query: ListStudentsDto) {
     return this.studentsService.findAll(query);
   }
 
+  @ApiCookieAuth('accessToken')
+  @UseGuards(JwtAccessGuard)
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const student = await this.studentsService.findOne(id);
@@ -32,11 +40,15 @@ export class StudentsController {
     return student;
   }
 
+  @ApiCookieAuth('accessToken')
+  @UseGuards(JwtAccessGuard)
   @Post()
   create(@Body() dto: CreateStudentDto) {
     return this.studentsService.create(dto);
   }
 
+  @ApiCookieAuth('accessToken')
+  @UseGuards(JwtAccessGuard)
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -48,6 +60,8 @@ export class StudentsController {
     return updatedStudent;
   }
 
+  @ApiCookieAuth('accessToken')
+  @UseGuards(JwtAccessGuard)
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     const ok = await this.studentsService.remove(id);

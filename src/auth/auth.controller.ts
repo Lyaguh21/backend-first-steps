@@ -13,7 +13,13 @@ import { RegisterDto } from './dto/register.dto';
 import { clearAuthCookies, setAuthCookies } from './auth.cookies';
 import { JwtAccessGuard } from './guards/jwt-access.guard';
 import type { Request, Response } from 'express';
+import { parseDurationMs } from './utils/parse-duration-ms';
+import { CurrentUser } from './decorators/current-user.decorator';
+import type { AuthUser, AuthUserWithRefresh } from '../types/auth-user.type';
+import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
+import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -33,12 +39,14 @@ export class AuthController {
     return 'lax';
   }
 
-  //? перевод в миллисекунды, по хорошему бы переделать на парсер
   private accessMaxAgeMs() {
-    return 15 * 60 * 1000;
+    const v = this.config.get<string>('JWT_ACCESS_EXPIRES') ?? '15m';
+    return parseDurationMs(v);
   }
+
   private refreshMaxAgeMs() {
-    return 7 * 24 * 60 * 60 * 1000;
+    const v = this.config.get<string>('JWT_REFRESH_EXPIRES') ?? '7d';
+    return parseDurationMs(v);
   }
 
   @Post('register')
@@ -81,12 +89,13 @@ export class AuthController {
     return { user: result.user };
   }
 
+  @ApiCookieAuth('accessToken')
+  @UseGuards(JwtRefreshGuard)
   @Post('refresh')
   async refresh(
-    @Req() req: Request,
+    @CurrentUser() user: AuthUserWithRefresh,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const user = req.user as any;
     const result = await this.auth.refreshTokens(
       user.userId,
       user.refreshToken,
@@ -105,10 +114,13 @@ export class AuthController {
     return { user: result.user };
   }
 
+  @ApiCookieAuth('accessToken')
   @UseGuards(JwtAccessGuard)
   @Post('logout')
-  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const user = req.user as any;
+  async logout(
+    @CurrentUser() user: AuthUser,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     await this.auth.logout(user.userId);
 
     clearAuthCookies(res, {
@@ -120,9 +132,10 @@ export class AuthController {
   }
 
   // тестовый эндпоинт: проверить, что access guard работает
+  @ApiCookieAuth('accessToken')
   @UseGuards(JwtAccessGuard)
   @Get('me')
-  me(@Req() req: Request) {
-    return { user: req.user };
+  me(@CurrentUser() user: AuthUser) {
+    return { user };
   }
 }

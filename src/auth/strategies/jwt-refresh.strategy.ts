@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import type { Request } from 'express';
+import { AuthUserWithRefresh } from 'src/types/auth-user.type';
 
 function cookieExtractorRefresh(req: Request): string | null {
   return req?.cookies?.refreshToken ?? null;
@@ -21,7 +22,10 @@ export class JwtRefreshStrategy extends PassportStrategy(
     });
   }
 
-  async validate(req: Request, payload: { sub: number; email: string }) {
+  async validate(
+    req: Request,
+    payload: { sub: number; email: string },
+  ): Promise<AuthUserWithRefresh> {
     const refreshToken = req.cookies?.refreshToken;
     return { userId: payload.sub, email: payload.email, refreshToken };
   }
