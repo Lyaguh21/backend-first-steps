@@ -135,10 +135,9 @@ export class AuthController {
     return { ok: true };
   }
 
-  // тестовый эндпоинт: проверить, что access guard работает
   @ApiCookieAuth('accessToken')
-  @Get('me')
-  me(@CurrentUser() user: AuthUser) {
-    return { user };
+  @Get('status')
+  status(@CurrentUser() user: AuthUser) {
+    return { authenticated: true, user };
   }
 }
