@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { ListStudentsDto } from './dto/list-students.dto';
-import { QueryMode } from 'generated/prisma/internal/prismaNamespace';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class StudentsService {
@@ -17,8 +17,8 @@ export class StudentsService {
     const where = search
       ? {
           OR: [
-            { name: { contains: search, mode: QueryMode.insensitive } },
-            { email: { contains: search, mode: QueryMode.insensitive } },
+            { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
+            { email: { contains: search, mode: Prisma.QueryMode.insensitive } },
           ],
         }
       : undefined;

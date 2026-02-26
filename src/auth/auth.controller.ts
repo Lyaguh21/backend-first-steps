@@ -18,6 +18,7 @@ import { CurrentUser } from './decorators/current-user.decorator';
 import type { AuthUser, AuthUserWithRefresh } from '../types/auth-user.type';
 import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
+import { Public } from './decorators/public.decorator';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -49,6 +50,7 @@ export class AuthController {
     return parseDurationMs(v);
   }
 
+  @Public()
   @Post('register')
   async register(
     @Body() dto: RegisterDto,
@@ -70,6 +72,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @Public()
   async login(
     @Body() dto: RegisterDto,
     @Res({ passthrough: true }) res: Response,
@@ -89,6 +92,7 @@ export class AuthController {
     return { user: result.user };
   }
 
+  @Public()
   @ApiCookieAuth('accessToken')
   @UseGuards(JwtRefreshGuard)
   @Post('refresh')
@@ -115,7 +119,6 @@ export class AuthController {
   }
 
   @ApiCookieAuth('accessToken')
-  @UseGuards(JwtAccessGuard)
   @Post('logout')
   async logout(
     @CurrentUser() user: AuthUser,
@@ -133,7 +136,6 @@ export class AuthController {
 
   // тестовый эндпоинт: проверить, что access guard работает
   @ApiCookieAuth('accessToken')
-  @UseGuards(JwtAccessGuard)
   @Get('me')
   me(@CurrentUser() user: AuthUser) {
     return { user };
