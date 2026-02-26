@@ -9,13 +9,11 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { ListStudentsDto } from './dto/list-students.dto';
-import { JwtAccessGuard } from 'src/auth/guards/jwt-access.guard';
 import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('students')

@@ -57,13 +57,17 @@ export class AuthService {
       select: {
         email: true,
         id: true,
+        role: true,
       },
     });
 
-    const tokens = await this.issueTokens(user.id, user.email);
+    const tokens = await this.issueTokens(user.id, user.email, user.role);
     await this.setRefreshTokenHash(user.id, tokens.refreshToken);
 
-    return { user, ...tokens };
+    return {
+      user: { id: user.id, email: user.email, role: user.role },
+      ...tokens,
+    };
   }
 
   async login(dto: RegisterDto) {
@@ -71,6 +75,12 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: {
         email,
+      },
+      select: {
+        id: true,
+        email: true,
+        passwordHash: true,
+        role: true,
       },
     });
 
@@ -80,7 +90,7 @@ export class AuthService {
     if (!ok) throw new BadRequestException('Неверный пароль');
 
     const safeUser = { id: user.id, email: user.email };
-    const tokens = await this.issueTokens(user.id, user.email);
+    const tokens = await this.issueTokens(user.id, user.email, user.role);
     await this.setRefreshTokenHash(user.id, tokens.refreshToken);
 
     return { user: safeUser, ...tokens };
@@ -102,6 +112,7 @@ export class AuthService {
         id: true,
         email: true,
         hashedRefreshToken: true,
+        role: true,
       },
     });
 
@@ -114,11 +125,14 @@ export class AuthService {
     );
     if (!matches) throw new ForbiddenException('Access Denied');
 
-    const tokens = await this.issueTokens(user.id, user.email);
+    const tokens = await this.issueTokens(user.id, user.email, user.role);
 
     await this.setRefreshTokenHash(user.id, tokens.refreshToken);
 
-    return { user: { id: user.id, email: user.email }, ...tokens };
+    return {
+      user: { id: user.id, email: user.email, role: user.role },
+      ...tokens,
+    };
   }
 
   private async setRefreshTokenHash(userId: number, refreshToken: string) {
@@ -129,18 +143,21 @@ export class AuthService {
     });
   }
 
-  private async issueTokens(userId: number, email: string) {
-    const payload = { sub: userId, email };
+  private async issueTokens(userId: number, email: string, role: string) {
+    const payload = { sub: userId, email, role };
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwt.signAsync(payload, {
         secret: this.getAccessSecret(),
         expiresIn: this.getAccessExpires(),
       }),
-      this.jwt.signAsync(payload, {
-        secret: this.getRefreshSecret(),
-        expiresIn: this.getRefreshExpires(),
-      }),
+      this.jwt.signAsync(
+        { sub: userId, email },
+        {
+          secret: this.getRefreshSecret(),
+          expiresIn: this.getRefreshExpires(),
+        },
+      ),
     ]);
     return { accessToken, refreshToken };
   }

@@ -27,6 +27,11 @@ export class JwtRefreshStrategy extends PassportStrategy(
     payload: { sub: number; email: string },
   ): Promise<AuthUserWithRefresh> {
     const refreshToken = req.cookies?.refreshToken;
-    return { userId: payload.sub, email: payload.email, refreshToken };
+    return {
+      userId: payload.sub,
+      email: payload.email,
+      refreshToken,
+      role: 'CUSTOMER',
+    };
   }
 }
