@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-
 import { PrismaModule } from './prisma/prisma.module';
 import { StudentsModule } from './students/students.module';
 import { ConfigModule } from '@nestjs/config';
@@ -8,7 +7,7 @@ import Joi from 'joi';
 import { JwtAccessGuard } from './auth/guards/jwt-access.guard';
 import { RolesGuard } from './auth/guards/roles.guards';
 import { UsersModule } from './users/users.module';
-import { UsersController } from './users/users.controller';
+
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({

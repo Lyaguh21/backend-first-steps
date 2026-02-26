@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Role } from 'src/types/auth-user.type';
+import { Role } from 'src/auth/types/auth-user.type';
 
 @Injectable()
 export class UsersService {
@@ -8,18 +8,6 @@ export class UsersService {
 
   getAll() {
     return this.prisma.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        createdAt: true,
-      },
-    });
-  }
-
-  async getMe(userId: number) {
-    return this.prisma.user.findUnique({
-      where: { id: userId },
       select: {
         id: true,
         email: true,

@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import type { Request } from 'express';
-import { AuthUser, Role } from 'src/types/auth-user.type';
+import { AuthUser, Role } from 'src/auth/types/auth-user.type';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 function cookieExtractorAccess(req: Request): string | null {

@@ -15,7 +15,7 @@ import { JwtAccessGuard } from './guards/jwt-access.guard';
 import type { Request, Response } from 'express';
 import { parseDurationMs } from './utils/parse-duration-ms';
 import { CurrentUser } from './decorators/current-user.decorator';
-import type { AuthUser, AuthUserWithRefresh } from '../types/auth-user.type';
+import type { AuthUser, AuthUserWithRefresh } from './types/auth-user.type';
 import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { Public } from './decorators/public.decorator';

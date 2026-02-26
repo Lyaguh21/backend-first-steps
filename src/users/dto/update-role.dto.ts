@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsIn, IsInt } from 'class-validator';
-import type { Role } from 'src/types/auth-user.type';
+import type { Role } from 'src/auth/types/auth-user.type';
 
 export class UpdateRoleDto {
   @ApiProperty({ example: 2 })
