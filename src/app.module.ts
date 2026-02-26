@@ -9,6 +9,7 @@ import { JwtAccessGuard } from './auth/guards/jwt-access.guard';
 import { RolesGuard } from './auth/guards/roles.guards';
 import { UsersModule } from './users/users.module';
 import { UsersController } from './users/users.controller';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -19,6 +20,12 @@ import { UsersController } from './users/users.controller';
         DATABASE_URL: Joi.string().required(),
       }),
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60_000,
+        limit: 10,
+      },
+    ]),
     PrismaModule,
     StudentsModule,
     AuthModule,
@@ -32,6 +39,10 @@ import { UsersController } from './users/users.controller';
     {
       provide: 'APP_GUARD',
       useClass: RolesGuard,
+    },
+    {
+      provide: 'APP_GUARD',
+      useClass: ThrottlerGuard,
     },
   ],
 })

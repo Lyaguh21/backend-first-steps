@@ -58,10 +58,16 @@ export class AuthService {
         email: true,
         id: true,
         role: true,
+        tokenVersion: true,
       },
     });
 
-    const tokens = await this.issueTokens(user.id, user.email, user.role);
+    const tokens = await this.issueTokens(
+      user.id,
+      user.email,
+      user.role,
+      user.tokenVersion,
+    );
     await this.setRefreshTokenHash(user.id, tokens.refreshToken);
 
     return {
@@ -81,6 +87,7 @@ export class AuthService {
         email: true,
         passwordHash: true,
         role: true,
+        tokenVersion: true,
       },
     });
 
@@ -90,7 +97,12 @@ export class AuthService {
     if (!ok) throw new BadRequestException('Неверный пароль');
 
     const safeUser = { id: user.id, email: user.email };
-    const tokens = await this.issueTokens(user.id, user.email, user.role);
+    const tokens = await this.issueTokens(
+      user.id,
+      user.email,
+      user.role,
+      user.tokenVersion,
+    );
     await this.setRefreshTokenHash(user.id, tokens.refreshToken);
 
     return { user: safeUser, ...tokens };
@@ -99,7 +111,7 @@ export class AuthService {
   async logout(userId: number) {
     await this.prisma.user.update({
       where: { id: userId },
-      data: { hashedRefreshToken: null },
+      data: { hashedRefreshToken: null, tokenVersion: { increment: 1 } },
     });
 
     return { ok: true };
@@ -113,6 +125,7 @@ export class AuthService {
         email: true,
         hashedRefreshToken: true,
         role: true,
+        tokenVersion: true,
       },
     });
 
@@ -125,7 +138,12 @@ export class AuthService {
     );
     if (!matches) throw new ForbiddenException('Access Denied');
 
-    const tokens = await this.issueTokens(user.id, user.email, user.role);
+    const tokens = await this.issueTokens(
+      user.id,
+      user.email,
+      user.role,
+      user.tokenVersion,
+    );
 
     await this.setRefreshTokenHash(user.id, tokens.refreshToken);
 
@@ -143,8 +161,13 @@ export class AuthService {
     });
   }
 
-  private async issueTokens(userId: number, email: string, role: string) {
-    const payload = { sub: userId, email, role };
+  private async issueTokens(
+    userId: number,
+    email: string,
+    role: string,
+    tokenVersion: number,
+  ) {
+    const payload = { sub: userId, email, role, tokenVersion };
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwt.signAsync(payload, {

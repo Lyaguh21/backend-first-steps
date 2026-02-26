@@ -44,6 +44,7 @@ export class UsersService {
       data: {
         role,
         hashedRefreshToken: null, // ключевое: выкидываем со всех устройств
+        tokenVersion: { increment: 1 },
       },
       select: { id: true, email: true, role: true },
     });

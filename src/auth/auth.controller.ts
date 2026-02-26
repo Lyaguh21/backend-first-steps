@@ -19,6 +19,7 @@ import type { AuthUser, AuthUserWithRefresh } from '../types/auth-user.type';
 import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { Public } from './decorators/public.decorator';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('auth')
 @Controller('auth')
