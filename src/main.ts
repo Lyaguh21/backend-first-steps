@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { ResponseInterceptor } from './common/interceptors/response.interceptor';
-import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
-import { AllExceptionFilter } from './common/filters/all-exeption.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import { AppModule } from './app.module';
+import { AllExceptionFilter } from './common/filters/all-exeption.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -25,10 +25,10 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('API')
-    .setDescription('CRM API')
+    .setTitle('Auth Service API')
+    .setDescription('Authentication microservice API')
     .setVersion('1.0')
-    .addCookieAuth('accessToken') // важно: cookie auth
+    .addCookieAuth('accessToken')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
@@ -38,6 +38,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3001);
 }
+
 bootstrap();

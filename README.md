@@ -1,8 +1,8 @@
-### Старт
+# Старт
 
 ```env
 DATABASE_URL="postgresql://admin:admin@localhost:5432/backend_db"
-PORT=3000
+PORT=3001
 
 JWT_ACCESS_SECRET=access_secret_very_long
 JWT_REFRESH_SECRET=refresh_secret_very_long
@@ -14,8 +14,18 @@ COOKIE_SECURE=false
 COOKIE_SAMESITE=lax
 ```
 
-```
+```bash
 docker-compose up -d
 npx prisma generate
 npm run start:dev
+```
+
+Swagger:
+
+- Auth сервис: <http://localhost:3001/docs>
+
+Одна команда для запуска PostgreSQL + auth микросервиса:
+
+```bash
+npm run up
 ```

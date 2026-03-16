@@ -33,7 +33,7 @@ export class AllExceptionFilter implements ExceptionFilter {
 
       const details = typeof response === 'object' ? response : null;
 
-      // Логируем только 5xx (или можно все)
+      // Логируем только 5xx 
       if (status >= 500) {
         this.logger.error(
           `${method} ${path} -> ${status} ${message}`,
@@ -44,15 +44,10 @@ export class AllExceptionFilter implements ExceptionFilter {
       }
 
       return res.status(status).json({
-        success: false,
-        timestamp,
-        path,
-        error: {
-          statusCode: status,
-          message,
-          code: 'HTTP_EXCEPTION',
-          details,
-        },
+        statusCode: status,
+        message,
+        code: 'HTTP_EXCEPTION',
+        details,
       });
     }
 
@@ -61,19 +56,13 @@ export class AllExceptionFilter implements ExceptionFilter {
     if (prismaCode) {
       const mapped = this.mapPrismaError(exception as any);
 
-      // Prisma ошибки часто 4xx, но всё равно полезно логировать
       this.logger.warn(`${method} ${path} -> ${mapped.status} ${mapped.code}`);
 
       return res.status(mapped.status).json({
-        success: false,
-        timestamp,
-        path,
-        error: {
-          statusCode: mapped.status,
-          message: mapped.message,
-          code: mapped.code,
-          details: (exception as any)?.meta ?? null,
-        },
+        statusCode: mapped.status,
+        message: mapped.message,
+        code: mapped.code,
+        details: (exception as any)?.meta ?? null,
       });
     }
 
@@ -87,14 +76,9 @@ export class AllExceptionFilter implements ExceptionFilter {
     );
 
     return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      timestamp,
-      path,
-      error: {
-        statusCode: 500,
-        message: 'Internal Server Error',
-        code: 'INTERNAL_SERVER_ERROR',
-      },
+      statusCode: 500,
+      message: 'Internal Server Error',
+      code: 'INTERNAL_SERVER_ERROR',
     });
   }
 

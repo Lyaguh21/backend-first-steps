@@ -6,15 +6,6 @@ datasource db {
   provider = "postgresql"
 }
 
-model Student {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String?  @unique
-  age       Int?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 enum Role {
   ADMIN
   WAITER
