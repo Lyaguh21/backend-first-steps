@@ -10,7 +10,6 @@ import cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalInterceptors(
-    new ResponseInterceptor(),
     new LoggingInterceptor(),
   );
   app.useGlobalFilters(new AllExceptionFilter());
@@ -18,9 +17,9 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // выкидывает лишние поля
-      forbidNonWhitelisted: true, // если пришли лишние поля — 400
-      transform: true, // превращает строки в нужные типы (если возможно)
+      whitelist: true, 
+      forbidNonWhitelisted: true, 
+      transform: true, 
     }),
   );
 
@@ -28,7 +27,7 @@ async function bootstrap() {
     .setTitle('API')
     .setDescription('CRM API')
     .setVersion('1.0')
-    .addCookieAuth('accessToken') // важно: cookie auth
+    .addCookieAuth('accessToken')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
@@ -36,6 +35,7 @@ async function bootstrap() {
 
   app.enableCors({
     credentials: true,
+    origin: 'http://localhost:5173',
   });
 
   await app.listen(process.env.PORT ?? 3000);

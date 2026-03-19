@@ -32,9 +32,7 @@ export class ResponseInterceptor implements NestInterceptor {
           };
         }
 
-        return {
-          success: true,
-          timestamp,
+        return {      
           data: result,
         };
       }),
