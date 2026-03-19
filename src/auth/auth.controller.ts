@@ -102,7 +102,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const result = await this.auth.refreshTokens(
-      user.userId,
+      user.id,
       user.refreshToken,
     );
 
@@ -125,7 +125,7 @@ export class AuthController {
     @CurrentUser() user: AuthUser,
     @Res({ passthrough: true }) res: Response,
   ) {
-    await this.auth.logout(user.userId);
+    await this.auth.logout(user.id);
 
     clearAuthCookies(res, {
       secure: this.cookieSecure(),
